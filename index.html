@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quartz - AI Prompt Gem for SaaS Entrepreneurs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #d946ef;
+            --dark: #1e1b4b;
+            --light: #f5f3ff;
+        }
+        
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            color: #1e1b4b;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark {
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 100%);
+            color: #f5f3ff;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass-card {
+            background: rgba(30, 27, 75, 0.7);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+        
+        .nav-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #a855f7 0%, #6366f1 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-item.active::after {
+            width: 100%;
+        }
+        
+        .prompt-card {
+            transition: all 0.3s ease;
+            transform-origin: top center;
+        }
+        
+        .prompt-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+        }
+        
+        .dark .prompt-card:hover {
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+        
+        .copy-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .copy-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+        
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        .quartz-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            animation: sparkle 2s infinite;
+        }
+        
+        @keyframes sparkle {
+            0% { transform: scale(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        
+        .prompt-variable {
+            background: rgba(167, 139, 250, 0.2);
+            border-radius: 4px;
+            padding: 0 4px;
+            border: 1px dashed rgba(167, 139, 250, 0.5);
+        }
+        
+        .dark .prompt-variable {
+            background: rgba(167, 139, 250, 0.3);
+        }
+    </style>
+</head>
+<body class="dark">
+    <div class="min-h-screen pb-20">
+        <!-- Floating Quartz Gem -->
+        <div class="fixed bottom-6 right-6 z-50 quartz-float cursor-pointer" onclick="createSparkles()">
+            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Header -->
+        <header class="py-6 px-4 sm:px-6 lg:px-8">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 mr-3 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Quartz</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="p-2 rounded-full bg-white/10 hover:bg-white/20 transition">
+                        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Navigation -->
+            <nav class="mb-8 overflow-x-auto">
+                <div class="flex space-x-1 p-1 rounded-lg bg-white/10 dark:bg-black/10 backdrop-blur-md w-max mx-auto">
+                    <button data-category="market-trends" class="nav-item active px-4 py-2 text-sm font-medium rounded-md transition">Market Trends</button>
+                    <button data-category="competitive-analysis" class="nav-item px-4 py-2 text-sm font-medium rounded-md transition">Competitive Analysis</button>
+                    <button data-category="customer-insights" class="nav-item px-4 py-2 text-sm font-medium rounded-md transition">Customer Insights</button>
+                    <button data-category="product-development" class="nav-item px-4 py-2 text-sm font-medium rounded-md transition">Product Development</button>
+                </div>
+            </nav>
+            
+            <!-- Category Content -->
+            <div id="category-content">
+                <!-- Market Trends -->
+                <div id="market-trends" class="category-section">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Prompt 1 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Emerging Trends Analysis</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Industry</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. EdTech, FinTech" data-variable="industry">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Timeframe</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. next 3 years" data-variable="timeframe">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    What are the most promising emerging trends in the [industry] industry that are likely to gain traction in the [timeframe]? Focus on technological advancements, consumer behavior shifts, and regulatory changes that could create opportunities for new SaaS products.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        
+                        <!-- Prompt 2 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Niche Opportunity Finder</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Industry</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. healthcare, real estate" data-variable="industry">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Pain Point</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. data silos, manual processes" data-variable="pain-point">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    Identify underserved niche opportunities in the [industry] sector where [pain-point] remains a significant challenge. List 5-7 specific problems that could be addressed with a specialized SaaS solution, including potential customer segments and estimated market size indicators.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        
+                        <!-- Prompt 3 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Trend Impact Assessment</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Trend</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. AI automation, remote work" data-variable="trend">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Business Type</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. SMBs, enterprises" data-variable="business-type">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    Analyze how the [trend] trend is transforming operations for [business-type]. What specific pain points are emerging that could be addressed with SaaS solutions? Provide a prioritized list of 5 potential SaaS product ideas that would help these businesses adapt to this trend.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Competitive Analysis -->
+                <div id="competitive-analysis" class="category-section hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Prompt 1 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Competitor Feature Gap Analysis</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Product Category</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. project management" data-variable="product-category">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Top Competitors</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. Asana, Trello" data-variable="competitors">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    Conduct a competitive analysis of [competitors] in the [product-category] space. Identify 3-5 significant feature gaps or user experience shortcomings that these platforms have based on customer reviews and industry analysis. For each gap, suggest how a new SaaS product could better address these needs.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        
+                        <!-- Prompt 2 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Pricing Strategy Insight</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Product Type</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. CRM, marketing automation" data-variable="product-type">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Target Market</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. startups, agencies" data-variable="target-market">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    Analyze the pricing strategies of leading [product-type] SaaS products targeting [target-market]. Identify common pricing model patterns, typical price points for different tiers, and any noticeable gaps in the pricing structures that could be exploited by a new entrant. Suggest an optimal pricing strategy for a new competitor entering this space.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        
+                        <!-- Prompt 3 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Differentiation Strategy</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Market Segment</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. e-commerce platforms" data-variable="market-segment">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Customer Need</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. conversion optimization" data-variable="customer-need">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    For the [market-segment] market where competitors primarily focus on [customer-need], suggest 5 innovative differentiation strategies a new SaaS product could employ. Include both feature-based differentiators and go-to-market approaches that would help carve out a unique position in this competitive landscape.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer Insights -->
+                <div id="customer-insights" class="category-section hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Prompt 1 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Persona Development</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Product Type</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. accounting software" data-variable="product-type">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Business Size</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. small businesses" data-variable="business-size">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    Develop 3 detailed buyer personas for [product-type] targeting [business-size]. For each persona, include: demographic information, key responsibilities, pain points, goals, objections to purchasing new software, and preferred communication channels. Also include the specific outcomes they would want from using such a product.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        
+                        <!-- Prompt 2 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Customer Journey Mapping</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Software Category</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. email marketing" data-variable="software-category">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">User Type</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. marketing managers" data-variable="user-type">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    Map out the complete customer journey for [user-type] evaluating and purchasing [software-category] solutions. Include: 1) Awareness stage triggers, 2) Consideration phase research behaviors, 3) Decision-making criteria, 4) Onboarding experience expectations, and 5) Retention factors. Highlight key moments where the experience could be improved.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        
+                        <!-- Prompt 3 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Churn Risk Analysis</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">SaaS Type</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. HR software" data-variable="saas-type">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Customer Segment</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. mid-market companies" data-variable="customer-segment">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    For [saas-type] serving [customer-segment], identify the top 5 reasons customers churn based on industry patterns. For each churn reason, suggest: 1) Early warning indicators, 2) Preventive measures the SaaS could implement, and 3) Recovery strategies to win back at-risk customers. Include specific product features or service approaches that could reduce each churn risk.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Development -->
+                <div id="product-development" class="category-section hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Prompt 1 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">MVP Feature Prioritization</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Product Concept</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. social media analytics" data-variable="product-concept">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Target User</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. content creators" data-variable="target-user">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    For a [product-concept] tool targeting [target-user], create a prioritized list of features for an MVP (Minimum Viable Product). Categorize them as: 1) Must-have core features without which the product wouldn't work, 2) Differentiators that set it apart, and 3) Nice-to-have features for future versions. Justify the prioritization based on user needs and technical feasibility.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        
+                        <!-- Prompt 2 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">User Onboarding Flow</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Software Type</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. project management" data-variable="software-type">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">User Technical Level</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. non-technical" data-variable="technical-level">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    Design an optimal user onboarding flow for [software-type] software designed for [technical-level] users. Break it down into stages from initial signup to first meaningful use of the product. Include: 1) Key actions to guide users through, 2) Milestones to celebrate, 3) Potential friction points to avoid, and 4) Metrics to track onboarding success. Suggest specific UI patterns and microcopy that would make this onboarding effective.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        
+                        <!-- Prompt 3 -->
+                        <div class="prompt-card glass-card rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-3">Feature Validation</h3>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Proposed Feature</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. AI content suggestions" data-variable="proposed-feature">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Existing Product</label>
+                                <input type="text" class="w-full px-3 py-2 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g. blogging platform" data-variable="existing-product">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-1">Prompt Preview</label>
+                                <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700 text-sm whitespace-pre-wrap prompt-preview">
+                                    Validate whether adding [proposed-feature] to our [existing-product] would provide significant value. Provide: 1) Potential user benefits, 2) Technical implementation challenges, 3) Competitive alternatives, 4) Monetization opportunities, and 5) Recommended validation methods (e.g., surveys, prototypes) to test demand before full development. Also suggest key metrics to track its success post-implementation.
+                                </div>
+                            </div>
+                            <button class="copy-btn w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md font-medium transition hover:opacity-90">
+                                Copy Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            
+            if (body.classList.contains('dark')) {
+                themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />';
+            } else {
+                themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />';
+            }
+        });
+        
+        // Category Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const categorySections = document.querySelectorAll('.category-section');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all nav items
+                navItems.forEach(navItem => navItem.classList.remove('active'));
+                
+                // Add active class to clicked item
+                item.classList.add('active');
+                
+                // Hide all category sections
+                categorySections.forEach(section => section.classList.add('hidden'));
+                
+                // Show selected category
+                const category = item.getAttribute('data-category');
+                document.getElementById(category).classList.remove('hidden');
+            });
+        });
+        
+        // Update prompt previews when inputs change
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('input[data-variable]')) {
+                const card = e.target.closest('.prompt-card');
+                const preview = card.querySelector('.prompt-preview');
+                let previewText = preview.dataset.original || preview.textContent;
+                
+                // Store original text if not already stored
+                if (!preview.dataset.original) {
+                    preview.dataset.original = previewText;
+                }
+                
+                // Replace all variables in the preview
+                card.querySelectorAll('input[data-variable]').forEach(input => {
+                    const variable = `[${input.getAttribute('data-variable')}]`;
+                    const value = input.value || input.placeholder;
+                    previewText = previewText.replace(new RegExp(escapeRegExp(variable), 'g'), `<span class="prompt-variable">${value}</span>`);
+                });
+                
+                preview.innerHTML = previewText;
+            }
+        });
+        
+        // Helper function to escape regex special characters
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+        
+        // Copy to clipboard functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('copy-btn')) {
+                const card = e.target.closest('.prompt-card');
+                const preview = card.querySelector('.prompt-preview');
+                let promptText = preview.dataset.original || preview.textContent;
+                
+                // Replace variables with their values
+                card.querySelectorAll('input[data-variable]').forEach(input => {
+                    const variable = `[${input.getAttribute('data-variable')}]`;
+                    const value = input.value || input.placeholder;
+                    promptText = promptText.replace(new RegExp(escapeRegExp(variable), 'g'), value);
+                });
+                
+                // Remove any HTML tags from the prompt text
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = promptText;
+                const cleanPromptText = tempDiv.textContent || tempDiv.innerText || '';
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(cleanPromptText).then(() => {
+                    const originalText = e.target.textContent;
+                    e.target.textContent = 'Copied!';
+                    e.target.classList.remove('copy-btn');
+                    
+                    setTimeout(() => {
+                        e.target.textContent = originalText;
+                        e.target.classList.add('copy-btn');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+        });
+        
+        // Initialize all previews with placeholders
+        document.querySelectorAll('.prompt-preview').forEach(preview => {
+            const card = preview.closest('.prompt-card');
+            let previewText = preview.textContent;
+            
+            // Store original text
+            preview.dataset.original = previewText;
+            
+            // Replace variables with placeholders initially
+            card.querySelectorAll('input[data-variable]').forEach(input => {
+                const variable = `[${input.getAttribute('data-variable')}]`;
+                const placeholder = input.placeholder;
+                previewText = previewText.replace(new RegExp(escapeRegExp(variable), 'g'), `<span class="prompt-variable">${placeholder}</span>`);
+            });
+            
+            preview.innerHTML = previewText;
+        });
+        
+        // Sparkle animation
+        function createSparkles() {
+            const colors = ['#a855f7', '#e879f9', '#c4b5fd', '#f0abfc'];
+            const container = document.querySelector('body');
+            
+            for (let i = 0; i < 15; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                
+                // Random properties
+                const size = Math.random() * 6 + 2;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const delay = Math.random() * 2;
+                
+                sparkle.style.width = `${size}px`;
+                sparkle.style.height = `${size}px`;
+                sparkle.style.background = color;
+                sparkle.style.left = `${Math.random() * 100}vw`;
+                sparkle.style.top = `${Math.random() * 100}vh`;
+                sparkle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(sparkle);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>
